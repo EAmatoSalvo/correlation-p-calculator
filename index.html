@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>t-stat / p-value calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      margin: 0;
+      background: #fff;
+      color: #222;
+    }
+    .wrap {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: 600;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 16px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    .small {
+      color: #666;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    .row {
+      margin-top: 8px;
+    }
+    code {
+      background: #f3f3f3;
+      padding: 2px 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h2>p-value from t statistic and degrees of freedom</h2>
+
+    <label for="tstat">t statistic</label>
+    <input id="tstat" type="number" step="any" placeholder="e.g. 2.13" />
+
+    <label for="df">Degrees of freedom</label>
+    <input id="df" type="number" step="1" placeholder="e.g. 28" />
+
+    <label for="tail">Test type</label>
+    <select id="tail">
+      <option value="two">Two-tailed</option>
+      <option value="left">One-tailed (left)</option>
+      <option value="right">One-tailed (right)</option>
+    </select>
+
+    <button onclick="calculateP()">Calculate</button>
+
+    <div class="result" id="output">
+      Enter values above and click Calculate.
+    </div>
+
+    <div class="small">
+      Formula used:
+      <div class="row">Two-tailed: <code>p = 2 * (1 - CDF(|t|))</code></div>
+      <div class="row">Right-tailed: <code>p = 1 - CDF(t)</code></div>
+      <div class="row">Left-tailed: <code>p = CDF(t)</code></div>
+    </div>
+  </div>
+
+  <script>
+    function calculateP() {
+      const t = parseFloat(document.getElementById("tstat").value);
+      const df = parseInt(document.getElementById("df").value, 10);
+      const tail = document.getElementById("tail").value;
+      const output = document.getElementById("output");
+
+      if (isNaN(t) || isNaN(df) || df <= 0) {
+        output.innerHTML = "Please enter a valid t statistic and a degrees of freedom value greater than 0.";
+        return;
+      }
+
+      const cdf = jStat.studentt.cdf(t, df);
+      let p;
+
+      if (tail === "two") {
+        p = 2 * (1 - jStat.studentt.cdf(Math.abs(t), df));
+      } else if (tail === "right") {
+        p = 1 - cdf;
+      } else {
+        p = cdf;
+      }
+
+      p = Math.max(0, Math.min(1, p));
+
+      output.innerHTML = `
+        <strong>Results</strong><br><br>
+        t statistic: ${t}<br>
+        degrees of freedom: ${df}<br>
+        test type: ${tail}<br>
+        p-value: <strong>${p.toPrecision(6)}</strong>
+      `;
+    }
+  </script>
+</body>
+</html>
