@@ -60,18 +60,18 @@
 <body>
   <div class="wrap">
     <h2>p-value from t statistic and Degrees of Freedom</h2>
-    <p>Take the corresponding values from the metrics</p>
-    <label for="tstat">t statistic</label>
+    <p>Take the corresponding values from the correlation checks on the side and plug them in below!</p>
+    <label for="tstat">t Statistic</label>
     <input id="tstat" type="number" step="any" placeholder="e.g. 2.13" />
 
-    <label for="df">Degrees of freedom</label>
+    <label for="df">Degrees of Freedom</label>
     <input id="df" type="number" step="1" placeholder="e.g. 28" />
 
     <label for="tail">Test type</label>
-    <select id="tail">
-      <option value="two">Two-tailed</option>
-      <option value="left">One-tailed (left)</option>
-      <option value="right">One-tailed (right)</option>
+    <select id="tail" selected="two">
+      <option value="two">Two-Tailed</option>
+      <option value="left">One-Tailed (left)</option>
+      <option value="right">One-Tailed (right)</option>
     </select>
 
     <button onclick="calculateP()">Calculate</button>
