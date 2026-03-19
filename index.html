@@ -59,8 +59,8 @@
 </head>
 <body>
   <div class="wrap">
-    <h2>p-value from t statistic and degrees of freedom</h2>
-
+    <h2>p-value from t statistic and Degrees of Freedom</h2>
+    <p>Take the corresponding values from the metrics</p>
     <label for="tstat">t statistic</label>
     <input id="tstat" type="number" step="any" placeholder="e.g. 2.13" />
 
@@ -89,38 +89,49 @@
   </div>
 
   <script>
-    function calculateP() {
-      const t = parseFloat(document.getElementById("tstat").value);
-      const df = parseInt(document.getElementById("df").value, 10);
-      const tail = document.getElementById("tail").value;
-      const output = document.getElementById("output");
-
-      if (isNaN(t) || isNaN(df) || df <= 0) {
-        output.innerHTML = "Please enter a valid t statistic and a degrees of freedom value greater than 0.";
-        return;
-      }
-
-      const cdf = jStat.studentt.cdf(t, df);
-      let p;
-
-      if (tail === "two") {
-        p = 2 * (1 - jStat.studentt.cdf(Math.abs(t), df));
-      } else if (tail === "right") {
-        p = 1 - cdf;
-      } else {
-        p = cdf;
-      }
-
-      p = Math.max(0, Math.min(1, p));
-
-      output.innerHTML = `
-        <strong>Results</strong><br><br>
-        t statistic: ${t}<br>
-        degrees of freedom: ${df}<br>
-        test type: ${tail}<br>
-        p-value: <strong>${p.toPrecision(6)}</strong>
-      `;
+    function evaluatePResult(p) {
+      if (p < 0.001) return "Highly statistically significant (p < 0.001)";
+      if (p < 0.01) return "Very statistically significant (p < 0.01)";
+      if (p < 0.05) return "Statistically significant (p < 0.05)";
+      if (p < 0.10) return "Marginally significant (p < 0.10)";
+      return "Not statistically significant (p ≥ 0.10)";
     }
+    
+function calculateP() {
+    const t = parseFloat(document.getElementById("tstat").value);
+    const df = parseInt(document.getElementById("df").value, 10);
+    const tail = document.getElementById("tail").value;
+    const output = document.getElementById("output");
+
+    if (isNaN(t) || isNaN(df) || df <= 0) {
+      output.innerHTML = "Please enter a valid t statistic and a degrees of freedom value greater than 0.";
+      return;
+    }
+
+    const cdf = jStat.studentt.cdf(t, df);
+    let p;
+
+    if (tail === "two") {
+      p = 2 * (1 - jStat.studentt.cdf(Math.abs(t), df));
+    } else if (tail === "right") {
+      p = 1 - cdf;
+    } else {
+      p = cdf;
+    }
+
+    p = Math.max(0, Math.min(1, p));
+
+    const significanceText = evaluatePResult(p);
+
+    output.innerHTML = `
+      <strong>Results</strong><br><br>
+      t statistic: ${t}<br>
+      degrees of freedom: ${df}<br>
+      test type: ${tail}<br>
+      p-value: <strong>${p.toPrecision(6)}</strong><br><br>
+      <strong>Interpretation:</strong> ${significanceText}
+    `;
+  }
   </script>
 </body>
 </html>
